@@ -9,6 +9,7 @@ from typing import Dict, List, Any
 
 DATA_FILE = "data/economy.json"
 
+
 ADMIN_ID = 660066534093357066 
 
 class CardsCog(commands.Cog):
@@ -51,6 +52,36 @@ class CardsCog(commands.Cog):
         user_data = self._get_user_data(user_id)
         user_data["inventory"].append(card_name); self.save_data()
 
+    @app_commands.command(name="help", description="Affiche la liste des commandes du système d'économie et de cartes.")
+    async def help_command(self, interaction: discord.Interaction):
+        
+        commands_list = [
+            ("Général", "/help", "Affiche ce guide."),
+            ("Économie", "/money", "Affiche ton solde actuel."),
+            ("Gagner", "/challenge", "Lance un mini-défi pour gagner des pièces."),
+            ("Cartes", "/buy_booster", "Achète un booster pack (coût : 100 💰)."),
+            ("Cartes", "/inventory", "Affiche les cartes que tu possèdes."),
+            ("Cartes", "/masterset", "Affiche la liste complète des cartes à collectionner."),
+            ("Admin", "/give @utilisateur <montant>", "Ajoute de l'argent à un utilisateur (Admin uniquement).")
+        ]
+        
+        # Formatte la liste des commandes pour l'embed
+        help_sections = {}
+        for cat, cmd, desc in commands_list:
+            if cat not in help_sections:
+                help_sections[cat] = []
+            help_sections[cat].append(f"• `{cmd}` : {desc}")
+
+        embed = discord.Embed(
+            title="📚 Guide des Commandes",
+            description="Voici toutes les commandes slash disponibles :\n",
+            color=discord.Color.gold()
+        )
+        
+        for category, items in help_sections.items():
+            embed.add_field(name=f"**{category}**", value="\n".join(items), inline=False)
+        
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     @app_commands.command(name="money", description="Voir ton argent")
     async def money(self, interaction: discord.Interaction):
@@ -144,7 +175,7 @@ class CardsCog(commands.Cog):
             
             if rarity == "commune": field_title = "🟩 Communes (80% de chance)"
             elif rarity == "rare": field_title = "🟦 Rares (15% de chance)"
-            elif rarity == "legendaire": field_title = "🟧 Légendaires (5% de chance)"
+            elif rarity == "legendaire": field_title = "🟪 Légendaires (5% de chance)"
             else: field_title = rarity.capitalize()
                 
             embed.add_field(name=field_title, value=cards_str, inline=False)
@@ -154,7 +185,6 @@ class CardsCog(commands.Cog):
 
 
     @app_commands.command(name="give", description="[Admin] Donne de l'argent à un utilisateur.")
-    # Vérifie l'ID utilisateur
     @app_commands.check(lambda i: i.user.id == ADMIN_ID) 
     async def give_money_slash(self, interaction: discord.Interaction, member: discord.Member, amount: app_commands.Range[int, 1, None]):
         

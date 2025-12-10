@@ -38,16 +38,15 @@ async def on_ready():
 
     print(f'🚀 Lancement du bot ! {client.user}')
 
+# --- FONCTION CORRIGÉE ---
 @client.event
 async def on_member_join(member: discord.Member):
+    # REMPLACER L'ID DU CANAL D'ACCUEIL
     member_channel = client.get_channel(1448251619320926238) 
     if member_channel:
-        await member_channel.send(f'Bienvenue <@{member.id}> !')
-
-@client.event
-async def on_member_leave(member: discord.Member):
-    member_channel = client.get_channel(1448251656755085442) 
-    if member_channel:
-        await member_channel.send(f'<@{member.id}> a quitté le serveur.')
+        # NOUVEAU MESSAGE : Propose la commande /help
+        await member_channel.send(
+            f'Bienvenue <@{member.id}> ! N\'hésitez pas à taper la commande **`/help`** pour voir toutes les fonctionnalités.'
+        )
 
 client.run(os.getenv('DISCORD_TOKEN'))
